@@ -31,7 +31,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "dadjokes",
 	Short: "Get a random dad joke in your terminal.",
-	Long:  `Dadjoke CLI is a tool that gives you a random dad joke.`,
+	Long:  `Dadjoke is a CLI tool that returns a random joke to the user via terminal.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

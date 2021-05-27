@@ -16,7 +16,11 @@ limitations under the License.
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 
 	"github.com/spf13/cobra"
 )
@@ -24,13 +28,8 @@ import (
 // randomCmd represents the random command
 var randomCmd = &cobra.Command{
 	Use:   "random",
-	Short: "This is the random command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "randomCmd returns a random dad joke.",
+	Long:  `This command fetches a random dad joke from the icanhazdadjoke api.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		getRandomJoke()
 	},
@@ -40,12 +39,53 @@ func init() {
 	rootCmd.AddCommand(randomCmd)
 }
 
+// create Joke struct
 type Joke struct {
 	ID     string `json:"id"`
 	Joke   string `json:"joke"`
-	Status int    `json:status`
+	Status int    `json:"status"`
 }
 
 func getRandomJoke() {
-	fmt.Println("Get random joke :P")
+	url := "https://icanhazdadjoke.com/"
+	responseBytes := getJokeData(url)
+
+	joke := Joke{}
+
+	// json.Unmarshall takes 2 arguments: responseBytes
+	if err := json.Unmarshal(responseBytes, &joke); err != nil {
+		log.Printf("Could not unmarshal response - %v", err)
+	}
+
+	fmt.Println(string(joke.Joke))
+}
+
+func getJokeData(baseAPI string) []byte {
+	// http.NewRequest takes 3 arguments: http.MethodGet, baseAPI, and nil.
+	// returns request and error
+	request, err := http.NewRequest(
+		http.MethodGet,
+		baseAPI,
+		nil,
+	)
+	if err != nil {
+		log.Printf("Could not request a dad joke - %v", err)
+	}
+
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("User-Agent", "Dadjoke CLI (github.com/example/dadjoke)")
+
+	// http.DefaultClient.Do(request) returns a response and error.
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		log.Printf("Could not return a response - %v", err)
+	}
+
+	// util.ReadAll(response.Body) returns a responseBytes and error.
+	responseBytes, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Printf("Cannot read body of response - %v", err)
+	}
+
+	return responseBytes
 }

@@ -37,7 +37,7 @@ random.go
 var randomCmd = &cobra.Command{
 	Use:   "random",
 	Short: "randomCmd returns a random dad joke.",
-	Long:  `This command fetches a random dad joke from the icanhazdadjoke api.`,
+	Long:  "This command fetches a random dad joke from the icanhazdadjoke api.",
   // Run executes by "go run main.go random"
 	Run: func(cmd *cobra.Command, args []string) {
 		getRandomJoke()
